@@ -1,0 +1,56 @@
+import os
+
+import numpy as np
+from torch.utils.data import Dataset
+from PIL import Image
+
+
+class MyDataset(Dataset):
+
+    def __init__(self, root, size=229, ):
+        """
+        Initialize the data producer
+        """
+        self._root = root
+        self._size = size
+        self._num_image = len(os.listdir(root))
+        self._img_name = os.listdir(root)
+
+    def __len__(self):
+        return self._num_image
+
+    def __getitem__(self, index):
+        img = Image.open(os.path.join(self._root, self._img_name[index]))
+
+        # PIF image: H × W × C
+        # torch image: C × H × W
+        img = np.array(img, dtype= np.float32).transpose((2, 0, 1))
+
+        return img
+
+
+
+from torch.utils.data import DataLoader
+
+# 实例化MyData
+dataset_tumor_train  = MyDataset(root='/img/train/tumor/')
+dataset_normal_train = MyDataset(root='/img/train/normal/')
+dataset_tumor_validation  = MyDataset(root='/img/validation/tumor/')
+dataset_normal_validation = MyDataset(root='/img/validation/normal/')
+
+# 封装到loader
+dataloader_tumor_train  = DataLoader(dataset_tumor_train, batch_size=10)
+dataloader_normal_train = DataLoader(dataset_normal_train, batch_size=10)
+dataloader_tumor_validation  = DataLoader(dataset_tumor_validation, batch_size=10)
+dataloader_normal_validation = DataLoader(dataset_normal_validation, batch_size=10)
+
+steps = len(dataloader_tumor_train)
+batch_size = dataloader_tumor_train.batch_size
+dataiter_tumor = iter(dataloader_tumor_train)
+
+
+
+
+
+
+
